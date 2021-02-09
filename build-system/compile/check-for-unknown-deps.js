@@ -16,6 +16,7 @@
 'use strict';
 
 const through = require('through2');
+const Stream = require('stream');
 const {log} = require('../common/logging');
 const {red, cyan, yellow} = require('kleur/colors');
 

@@ -144,7 +144,7 @@ function compileCss(options = {}) {
 
   cssEntryPoints.forEach(({path, outJs, outCss, append}) => {
     promise = promise.then(() =>
-      writeCssEntryPoint(path, outJs, outCss, append)
+      writeCssEntryPoint(path, outJs, outCss, Boolean(append))
     );
   });
 

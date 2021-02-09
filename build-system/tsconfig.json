@@ -28,5 +28,11 @@
     "./server/**/*.js",
     "./server/**/*.ts"
   ],
+<<<<<<< HEAD
   "exclude": ["**/node_modules", "common/check-package-manager.js"]
+=======
+  "exclude": [
+    "**/node_modules"
+  ]
+>>>>>>> ac03c7b74 (create tsconfig and fix lots of type errors)
 }

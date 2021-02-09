@@ -51,6 +51,7 @@ const MAX_PARALLEL_CLOSURE_INVOCATIONS =
  * production use. During development we intend to continue using
  * babel, as it has much faster incremental compilation.
  *
+<<<<<<< HEAD
  * @param {string} entryModuleFilename
  * @param {string} outputDir
  * @param {string} outputFilename
@@ -67,6 +68,8 @@ const MAX_PARALLEL_CLOSURE_INVOCATIONS =
  *  skipUnknownDepsCheck?: boolean,
  * }} options
  * @param {{startTime?: number}} timeInfo
+=======
+>>>>>>> ac03c7b74 (create tsconfig and fix lots of type errors)
  * @return {Promise<void>}
  */
 async function closureCompile(
@@ -252,7 +255,11 @@ function compile(
 
     /**
      * TODO(#28387) write a type for this.
+<<<<<<< HEAD
      * @type {Object}
+=======
+     * @type {*}
+>>>>>>> ac03c7b74 (create tsconfig and fix lots of type errors)
      */
     /* eslint "google-camelcase/google-camelcase": 0*/
     const compilerOptions = {
