@@ -52,6 +52,9 @@ const MAX_PARALLEL_CLOSURE_INVOCATIONS =
  * babel, as it has much faster incremental compilation.
  *
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> f68b21532 (update typing in response to comments)
  * @param {string} entryModuleFilename
  * @param {string} outputDir
  * @param {string} outputFilename
@@ -68,8 +71,11 @@ const MAX_PARALLEL_CLOSURE_INVOCATIONS =
  *  skipUnknownDepsCheck?: boolean,
  * }} options
  * @param {{startTime?: number}} timeInfo
+<<<<<<< HEAD
 =======
 >>>>>>> ac03c7b74 (create tsconfig and fix lots of type errors)
+=======
+>>>>>>> f68b21532 (update typing in response to comments)
  * @return {Promise<void>}
  */
 async function closureCompile(
@@ -255,11 +261,7 @@ function compile(
 
     /**
      * TODO(#28387) write a type for this.
-<<<<<<< HEAD
      * @type {Object}
-=======
-     * @type {*}
->>>>>>> ac03c7b74 (create tsconfig and fix lots of type errors)
      */
     /* eslint "google-camelcase/google-camelcase": 0*/
     const compilerOptions = {
