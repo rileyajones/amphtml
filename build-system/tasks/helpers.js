@@ -20,6 +20,7 @@ const crypto = require('crypto');
 const debounce = require('debounce');
 const del = require('del');
 const esbuild = require('esbuild');
+/** @type {Object} */
 const experimentDefines = require('../global-configs/experiments-const.json');
 const file = require('gulp-file');
 const fs = require('fs-extra');
@@ -582,7 +583,7 @@ function printNobuildHelp() {
  * @param {string=} covPath
  * @return {!Promise}
  */
-async function maybePrintCoverageMessage(covPath) {
+async function maybePrintCoverageMessage(covPath = '') {
   if (!argv.coverage || isCiBuild()) {
     return;
   }
@@ -614,7 +615,7 @@ async function applyAmpConfig(targetFile, localDev, fortesting) {
       baseConfigFile,
       /* opt_localDev */ localDev,
       /* opt_localBranch */ true,
-      /* opt_branch */ false,
+      /* opt_branch */ undefined,
       /* opt_fortesting */ fortesting
     );
   });
