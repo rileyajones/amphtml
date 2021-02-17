@@ -109,7 +109,7 @@ function doBuildJs(jsBundles, name, extraOptions) {
       {...target.options, ...extraOptions}
     );
   } else {
-    return Promise.reject(red('Error:'), 'Could not find', cyan(name));
+    return Promise.reject([red('Error:'), 'Could not find', cyan(name)].join(' '));
   }
 }
 
@@ -210,9 +210,14 @@ function combineWithCompiledFile(srcFilename, destFilePath, options) {
   });
   // We need to inject the code _inside_ the extension wrapper
   const destFileName = path.basename(destFilePath);
-  const contents = new MagicString(fs.readFileSync(destFilePath, 'utf8'), {
-    filename: destFileName,
-  });
+  /**
+   * TODO (rileyajones) This should be import('magic-string').MagicStringOptions but
+   * is invalid until https://github.com/Rich-Harris/magic-string/pull/183
+   * is merged.
+   * @type {Object}
+   */
+  const mapMagicStringOptions = {filename: destFileName};
+  const contents = new MagicString.default(fs.readFileSync(destFilePath, 'utf8'), mapMagicStringOptions);
   const map = JSON.parse(fs.readFileSync(`${destFilePath}.map`, 'utf8'));
   const {sourceRoot} = map;
   map.sourceRoot = undefined;
@@ -229,7 +234,14 @@ function combineWithCompiledFile(srcFilename, destFilePath, options) {
   bundle.addSource(wrapperOpen);
   for (const bundleFile of bundleFiles) {
     const contents = fs.readFileSync(bundleFile, 'utf8');
-    bundle.addSource(new MagicString(contents, {filename: bundleFile}));
+    /**
+     * TODO (rileyajones) This should be import('magic-string').MagicStringOptions but
+     * is invalid until https://github.com/Rich-Harris/magic-string/pull/183
+     * is merged.
+     * @type {Object}
+     */
+    const bundleMagicStringOptions = {filename: bundleFile};
+    bundle.addSource(new MagicString.default(contents, bundleMagicStringOptions));
     bundle.append(MODULE_SEPARATOR);
   }
   bundle.addSource(remainingContents);
@@ -331,6 +343,7 @@ async function compileMinifiedJs(srcDir, srcFilename, destDir, options) {
  * @param {string} destFilename
  */
 function handleBundleError(err, continueOnError, destFilename) {
+  /** @type {Error|string} */
   let message = err;
   if (err.stack) {
     // Drop the node_modules call stack, which begins with '    at'.
@@ -409,7 +422,7 @@ async function compileUnminifiedJs(srcDir, srcFilename, destDir, options) {
           filename: file.path,
           sourceFileName: path.relative(process.cwd(), file.path),
         });
-        const result = await babel.transformAsync(contents, babelOptions);
+        const result = await babel.transformAsync(contents, babelOptions || undefined);
         return {contents: result.code};
       };
 
