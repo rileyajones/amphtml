@@ -95,7 +95,7 @@ const adVendors = [];
  * @param {string} name
  * @param {string|!Array<string>} version E.g. 0.1 or [0.1, 0.2]
  * @param {string} latestVersion E.g. 0.1
- * @param {!ExtensionOption} options extension options object.
+ * @param {ExtensionOption|undefined} options extension options object.
  * @param {!Object} extensionsObject
  * @param {boolean} includeLatest
  */
@@ -141,6 +141,7 @@ function maybeInitializeExtensions(
 ) {
   if (Object.keys(extensionsObject).length === 0) {
     verifyExtensionBundles();
+
     extensionBundles.forEach((c) => {
       declareExtension(
         c.name,

@@ -28,6 +28,10 @@ const gulp = require('gulp');
 const MagicString = require('magic-string');
 const open = require('open');
 const path = require('path');
+/**
+ * TypeScript doesn't like default exports.
+ * @type {*}
+ */
 const remapping = require('@ampproject/remapping');
 const wrappers = require('../compile/compile-wrappers');
 const {
