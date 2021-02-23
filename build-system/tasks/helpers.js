@@ -113,7 +113,9 @@ function doBuildJs(jsBundles, name, extraOptions) {
       {...target.options, ...extraOptions}
     );
   } else {
-    return Promise.reject([red('Error:'), 'Could not find', cyan(name)].join(' '));
+    return Promise.reject(
+      [red('Error:'), 'Could not find', cyan(name)].join(' ')
+    );
   }
 }
 
@@ -236,7 +238,10 @@ function combineWithCompiledFile(srcFilename, destFilePath, options) {
    * @type {Object}
    */
   const mapMagicStringOptions = {filename: destFileName};
-  const contents = new MagicString.default(fs.readFileSync(destFilePath, 'utf8'), mapMagicStringOptions);
+  const contents = new MagicString.default(
+    fs.readFileSync(destFilePath, 'utf8'),
+    mapMagicStringOptions
+  );
   const map = JSON.parse(fs.readFileSync(`${destFilePath}.map`, 'utf8'));
   const {sourceRoot} = map;
   map.sourceRoot = undefined;
@@ -260,7 +265,9 @@ function combineWithCompiledFile(srcFilename, destFilePath, options) {
      * @type {Object}
      */
     const bundleMagicStringOptions = {filename: bundleFile};
-    bundle.addSource(new MagicString.default(contents, bundleMagicStringOptions));
+    bundle.addSource(
+      new MagicString.default(contents, bundleMagicStringOptions)
+    );
     bundle.append(MODULE_SEPARATOR);
   }
   bundle.addSource(remainingContents);
@@ -441,7 +448,10 @@ async function compileUnminifiedJs(srcDir, srcFilename, destDir, options) {
           filename: file.path,
           sourceFileName: path.relative(process.cwd(), file.path),
         });
-        const result = await babel.transformAsync(contents, babelOptions || undefined);
+        const result = await babel.transformAsync(
+          contents,
+          babelOptions || undefined
+        );
         return {contents: result.code};
       };
 
