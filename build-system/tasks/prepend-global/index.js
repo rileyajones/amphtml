@@ -129,7 +129,7 @@ function valueOrDefault(value, defaultValue) {
  * @param {boolean=} opt_localBranch Whether to use the local branch version
  * @param {string=} opt_branch If not the local branch, which branch to use
  * @param {boolean=} opt_fortesting Whether to force getMode().test to be true
- * @return {!Promise}
+ * @return {!Promise<void>}
  */
 async function applyConfig(
   config,
@@ -219,7 +219,7 @@ function enableLocalDev(target, configJson) {
 
 /**
  * @param {string} target Target file from which to remove the AMP config
- * @return {!Promise}
+ * @return {!Promise<void>}
  */
 async function removeConfig(target) {
   const file = await fs.promises.readFile(target);
@@ -234,6 +234,9 @@ async function removeConfig(target) {
   log('Removed existing config from', cyan(target));
 }
 
+/**
+ * @return {Promise<void>}
+ */
 async function prependGlobal() {
   const TESTING_HOST = process.env.AMP_TESTING_HOST;
   const target = argv.target || TESTING_HOST;

@@ -17,6 +17,12 @@
 const pathmodule = require('path');
 const {addNamed} = require('@babel/helper-module-imports');
 
+/**
+ * @param {*} babel
+ * @param {{
+ *  importFrom?: string,
+ * }} options
+ */
 module.exports = function (babel, options = {}) {
   const {types: t} = babel;
   const promiseResolveMatcher = t.buildMatchMemberExpression('Promise.resolve');

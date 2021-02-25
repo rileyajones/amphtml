@@ -98,9 +98,10 @@ exports.postClosureBabel = function () {
         file.contents,
         file.sourceMap
       );
-      const {code, map: babelMap} = babel.transformSync(file.contents, {
-        caller: {name: 'post-closure'},
-      }) || {};
+      const {code, map: babelMap} =
+        babel.transformSync(file.contents, {
+          caller: {name: 'post-closure'},
+        }) || {};
       if (!code || !babelMap) {
         throw new Error(`Error transforming contents of ${file.path}`);
       }

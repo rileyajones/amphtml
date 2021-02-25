@@ -225,6 +225,9 @@ async function buildWebPushPublisherFiles() {
   await postBuildWebPushPublisherFilesVersion();
 }
 
+/**
+ * @return {Promise<void>}
+ */
 async function prebuild() {
   await preBuildExperiments();
   await preBuildLoginDone();

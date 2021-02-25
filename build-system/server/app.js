@@ -366,7 +366,6 @@ app.use('/form/json/poll1', (req, res) => {
 app.post('/form/json/upload', upload.fields([{name: 'myFile'}]), (req, res) => {
   cors.assertCors(req, res, ['POST']);
 
-  /** @type {!Array<!File>|undefined} */
   const myFile = req.files['myFile'];
 
   if (!myFile) {
@@ -1002,9 +1001,10 @@ app.get(
 
         // Extract amp-ad for the given 'type' specified in URL query.
         if (req.path.indexOf('/examples/ads.amp.html') == 0 && req.query.type) {
-          const ads = file.match(
-            elementExtractor('(amp-ad|amp-embed)', req.query.type)
-          );
+          const ads =
+            file.match(
+              elementExtractor('(amp-ad|amp-embed)', req.query.type)
+            ) ?? [];
           file = file.replace(
             /<body>[\s\S]+<\/body>/m,
             '<body>' + ads.join('') + '</body>'
@@ -1016,9 +1016,8 @@ app.get(
           req.path.indexOf('/examples/analytics-vendors.amp.html') == 0 &&
           req.query.type
         ) {
-          const analytics = file.match(
-            elementExtractor('amp-analytics', req.query.type)
-          );
+          const analytics =
+            file.match(elementExtractor('amp-analytics', req.query.type)) ?? [];
           file = file.replace(
             /<div id="container">[\s\S]+<\/div>/m,
             '<div id="container">' + analytics.join('') + '</div>'
@@ -1030,9 +1029,8 @@ app.get(
           req.path.indexOf('/examples/amp-consent/cmp-vendors.amp.html') == 0 &&
           req.query.type
         ) {
-          const consent = file.match(
-            elementExtractor('amp-consent', req.query.type)
-          );
+          const consent =
+            file.match(elementExtractor('amp-consent', req.query.type)) ?? [];
           file = file.replace(
             /<div id="container">[\s\S]+<\/div>/m,
             '<div id="container">' + consent.join('') + '</div>'

@@ -48,6 +48,6 @@ module.exports = {
     'local/no-module-exports': 0,
     'local/no-rest': 0,
     'local/no-spread': 0,
-    'require-jsdoc': 0,
+    'require-jsdoc': 1,
   },
 };

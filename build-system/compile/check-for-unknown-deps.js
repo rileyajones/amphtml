@@ -15,10 +15,10 @@
  */
 'use strict';
 
+const Stream = require('stream');
 const through = require('through2');
 const {log} = require('../common/logging');
 const {red, cyan, yellow} = require('kleur/colors');
-const Stream = require('stream');
 
 /**
  * Searches for the identifier "module$", which Closure uses to uniquely
