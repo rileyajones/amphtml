@@ -23,6 +23,7 @@ const {cyan, red, yellow} = require('kleur/colors');
 const {EventEmitter} = require('events');
 const {highlight} = require('cli-highlight');
 const {log} = require('../common/logging');
+const Stream = require('stream');
 
 let compilerErrors = '';
 
@@ -101,7 +102,7 @@ function logError(message) {
  * in `src/`, it ends up resolving to `src/src/foo.js`.
  *
  * @param {!Stream} closureStream
- * @return {!Stream}
+ * @return {!Stream.Writable}
  */
 function makeSourcemapsRelative(closureStream) {
   const relativeSourceMap = sourcemaps.mapSources((source, file) => {
@@ -114,7 +115,7 @@ function makeSourcemapsRelative(closureStream) {
 
 /**
  * @param {Array<string>} compilerOptions
- * @return {stream.Writable}
+ * @return {Stream.Writable}
  */
 function gulpClosureCompile(compilerOptions) {
   const pluginOptions = {

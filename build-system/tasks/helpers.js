@@ -453,6 +453,9 @@ async function compileUnminifiedJs(srcDir, srcFilename, destDir, options) {
           contents,
           babelOptions || undefined
         );
+        if (!result) {
+          throw new Error(`Error transforming contents of ${file.path}`);
+        }
         return {contents: result.code};
       };
 
