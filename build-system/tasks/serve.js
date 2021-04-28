@@ -15,6 +15,7 @@
  */
 'use strict';
 
+const cacheServer = require('../cache-server/app');
 const connect = require('gulp-connect');
 const debounce = require('debounce');
 const globby = require('globby');
@@ -119,6 +120,10 @@ async function startServer(
   connect.server(options, started);
   await startedPromise;
 
+  await new Promise((resolve) => {
+    cacheServer.listen(8001, resolve);
+  });
+
   /**
    * @param {string} host
    * @return {string}
@@ -161,6 +166,7 @@ function resetServerFiles() {
 async function stopServer() {
   if (url) {
     connect.serverClose();
+    cacheServer.close();
     log(green('Stopped server at'), cyan(url));
     url = null;
   }
