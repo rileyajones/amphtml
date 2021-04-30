@@ -120,9 +120,7 @@ async function startServer(
   connect.server(options, started);
   await startedPromise;
 
-  await new Promise((resolve) => {
-    cacheServer.listen(8001, resolve);
-  });
+  await cacheServer.listen(8001);
 
   /**
    * @param {string} host

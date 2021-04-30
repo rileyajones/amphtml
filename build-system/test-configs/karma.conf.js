@@ -117,7 +117,7 @@ module.exports = {
         '--no-sandbox',
         '--remote-debugging-port=9222',
         // https://github.com/karma-runner/karma-chrome-launcher/issues/175
-        // "--proxy-server='http=localhost:8001;https=localhost:8001'",
+        "--proxy-server='http=localhost:8001;https=localhost:8001'",
         "--proxy-server='direct://'",
         '--proxy-bypass-list=*',
       ].concat(COMMON_CHROME_FLAGS),
