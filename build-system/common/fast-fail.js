@@ -21,7 +21,6 @@ const {mkdirSync} = require('../tasks/helpers');
 const {parentPort, workerData} = require('worker_threads');
 const {red} = require('./colors');
 const {writeFileSync} = require('fs');
-const { exec } = require('./exec');
 
 const {CIRCLE_TOKEN, CIRCLE_WORKFLOW_ID} = process.env;
 
@@ -76,8 +75,9 @@ async function terminate(output) {
   mkdirSync('result-reports');
   writeFileSync('result-reports/fast_fail.log', output);
   // Trying to get lots to output correctly
+  process.kill(getPid(), 0);
   log(red('Shutting down'), output);
-  exec('circleci-agent step halt');
+  process.exit(1);
 }
 
 /**
