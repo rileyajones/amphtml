@@ -225,6 +225,39 @@ class SeleniumWebDriverController {
   }
 
   /**
+   * Wait for the next animation frame.
+   * @return {Promise<void>}
+   */
+  waitForFrame() {
+    return new Promise(async (resolve) => {
+      const framePromise = await this.evaluate(
+        () =>
+          /** @type {Promise<void>} */ (
+            new Promise((resolve) =>
+              window.requestAnimationFrame(() => resolve())
+            )
+          )
+      );
+      await framePromise;
+      resolve();
+    });
+  }
+
+  /**
+   * Get the first frame rendered after delay.
+   * Calling await sleep(delay), then requesting then await waitForFrame will be
+   * approximately 1/2 frametime slower.
+   * @param {number} delay
+   * @return {Promise<void>}
+   */
+  async waitForFrameAfterDelay(delay) {
+    const startTime = Date.now();
+    while (Date.now() - startTime < delay) {
+      await this.waitForFrame();
+    }
+  }
+
+  /**
    * Install a third-party XPath library if it is not already installed.
    * @return {!Promise}
    */
