@@ -346,16 +346,23 @@ async function buildExtensions(options) {
   maybeInitializeExtensions(extensions, /* includeLatest */ false);
   const extensionsToBuild = getExtensionsToBuild();
   const results = [];
-  for (const extension in extensions) {
-    if (
+  const filteredExtensions = Object.keys(extensions).filter(
+    (extension) =>
       options.compileOnlyCss ||
       extensionsToBuild.includes(extensions[extension].name)
-    ) {
-      results.push(doBuildExtension(extensions, extension, options));
+  );
+  for (const extension of filteredExtensions) {
+    // Building extensions synchronously works in Docker.
+    const result = await doBuildExtension(extensions, extension, options);
+    if (argv.sync) {
+      await result;
+      continue;
     }
+    results.push(result);
   }
-  await Promise.all(results);
-  if (!options.compileOnlyCss && results.length > 0) {
+  await results;
+
+  if (!options.compileOnlyCss && filteredExtensions.length > 0) {
     endBuildStep(
       options.minify ? 'Minified all' : 'Compiled all',
       'extensions',

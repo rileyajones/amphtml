@@ -80,4 +80,5 @@ build.flags = {
   esm: 'Do not transpile down to ES5',
   define_experiment_constant:
     'Build runtime with the EXPERIMENT constant set to true',
+  sync: 'Build files synchronously',
 };

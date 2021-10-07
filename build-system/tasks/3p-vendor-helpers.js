@@ -7,6 +7,8 @@ const {VERSION} = require('../compile/internal-version');
 const {watchDebounceDelay} = require('./helpers');
 const {watch} = require('chokidar');
 
+const argv = require('minimist')(process.argv.slice(2));
+
 const SRCPATH = ['3p/vendors/*.js'];
 
 /**
@@ -30,18 +32,25 @@ async function buildVendorConfigs(options) {
   }
 
   const startTime = Date.now();
-  const bundles = generateBundles();
+  const bundles = Object.values(generateBundles());
 
-  await Promise.all(
-    Object.values(bundles).map((bundle) =>
-      esbuildCompile(
-        bundle.srcDir,
-        bundle.srcFilename,
-        options.minify ? bundle.minifiedDestDir : bundle.destDir,
-        {...bundle.options, ...options}
-      )
-    )
-  );
+  // Compiling Synchronously for Docker
+  const results = [];
+  for (const bundle of bundles) {
+    const result = esbuildCompile(
+      bundle.srcDir,
+      bundle.srcFilename,
+      options.minify ? bundle.minifiedDestDir : bundle.destDir,
+      {...bundle.options, ...options}
+    );
+    if (argv.sync) {
+      await result;
+      continue;
+    }
+    results.push(result);
+  }
+
+  await results;
 
   endBuildStep(
     (options.minify ? 'Minified' : 'Compiled') +
