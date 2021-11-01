@@ -5,7 +5,7 @@ import {createParseAttrsWithPrefix} from '#preact/parse-props';
 
 import {BentoJwplayer} from './component';
 
-import {VideoBaseElement} from '../../../../extensions/amp-video/1.0/video-base-element';
+import {VideoBaseElement} from '../../../../../extensions/amp-video/1.0/video-base-element';
 
 export class BaseElement extends VideoBaseElement {
   /** @override */
