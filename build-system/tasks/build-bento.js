@@ -13,6 +13,7 @@ const {
   getExtensionsFromArg,
 } = require('./extension-helpers');
 const {bentoBundles, verifyBentoBundles} = require('../compile/bundles.config');
+const {compileJison} = require('./compile-jison');
 const {endBuildStep, watchDebounceDelay} = require('./helpers');
 const {existsSync, mkdirSync} = require('fs');
 const {getBentoName} = require('./bento-helpers');
@@ -21,10 +22,7 @@ const {red} = require('kleur/colors');
 const {watch} = require('chokidar');
 
 // All declared components.
-const components = {};
-
-// All components to build.
-let componentsToBuild = null;
+const COMPONENTS = {};
 
 /**
  * Initializes all components from build-system/compile/bundles.config.bento.json
@@ -32,10 +30,7 @@ let componentsToBuild = null;
  * @param {?Object} componentsObject
  * @param {boolean=} includeLatest
  */
-function maybeInitializeComponents(
-  componentsObject = components,
-  includeLatest = false
-) {
+function maybeInitializeComponents(componentsObject, includeLatest = false) {
   if (Object.keys(componentsObject).length === 0) {
     verifyBentoBundles();
     bentoBundles.forEach((c) => {
@@ -60,7 +55,7 @@ function maybeInitializeComponents(
  * @return {!Array<string>}
  */
 function getComponentsToBuild(preBuild = false) {
-  componentsToBuild = [];
+  let componentsToBuild = [];
   if (argv.extensions) {
     if (typeof argv.extensions !== 'string') {
       log(red('ERROR:'), 'Missing list of components.');
@@ -82,7 +77,7 @@ function getComponentsToBuild(preBuild = false) {
     !argv.extensions_from &&
     !argv.core_runtime_only
   ) {
-    const allComponents = Object.values(components).map((c) => c.name);
+    const allComponents = Object.values(COMPONENTS).map((c) => c.name);
     componentsToBuild = dedupe(componentsToBuild.concat(allComponents));
   }
   return componentsToBuild;
@@ -153,53 +148,44 @@ async function buildComponent(name, version, hasCss, options = {}, extraGlobs) {
     await watchComponent(componentsDir, name, version, hasCss, options);
   }
 
+  const promises = [];
   if (hasCss) {
     if (!existsSync('build/css')) {
       mkdirSync('build/css', {recursive: true});
     }
-    await buildExtensionCss(componentsDir, name, version, {
-      ...options,
-      bento: true,
-    });
+    promises.push(buildExtensionCss(componentsDir, name, version, options));
     if (options.compileOnlyCss) {
+      await Promise.all(promises);
       return;
     }
   }
-  await buildNpmBinaries(componentsDir, name, options);
-  await buildNpmCss(componentsDir, options);
+  promises.push(compileJison(`${componentsDir}/**/*.jison`));
+  promises.push(buildNpmBinaries(componentsDir, name, options));
+  promises.push(buildNpmCss(componentsDir, options));
   if (options.binaries) {
-    await buildBinaries(componentsDir, options.binaries, options);
+    promises.push(buildBinaries(componentsDir, options.binaries, options));
   }
   if (options.isRebuild) {
+    await Promise.all(promises);
     return;
   }
 
   const bentoName = getBentoName(name);
-  await buildExtensionJs(componentsDir, bentoName, {
-    ...options,
-    wrapper: 'none',
-    filename: await getBentoBuildFilename(
-      componentsDir,
-      bentoName,
-      'standalone',
-      options
-    ),
-    // Include extension directory since our entrypoint may be elsewhere.
-    extraGlobs: [...(options.extraGlobs || []), `${componentsDir}/**/*.js`],
-  });
-}
-
-/**
- * Builds a single component after extracting its settings.
- * @param {!Object} components
- * @param {string} component
- * @param {!Object} options
- * @return {!Promise<void>}
- */
-async function doBuildComponent(components, component, options) {
-  const e = components[component];
-  const o = {...options, ...e};
-  await buildComponent(e.name, e.version, e.hasCss, o, e.extraGlobs);
+  promises.push(
+    buildExtensionJs(componentsDir, bentoName, {
+      ...options,
+      wrapper: 'none',
+      filename: await getBentoBuildFilename(
+        componentsDir,
+        bentoName,
+        'standalone',
+        options
+      ),
+      // Include extension directory since our entrypoint may be elsewhere.
+      extraGlobs: [...(options.extraGlobs || []), `${componentsDir}/**/*.js`],
+    })
+  );
+  await Promise.all(promises);
 }
 
 /**
@@ -210,17 +196,22 @@ async function doBuildComponent(components, component, options) {
  */
 async function buildBentoComponents(options) {
   const startTime = Date.now();
-  maybeInitializeComponents();
+  maybeInitializeComponents(COMPONENTS);
   const toBuild = getComponentsToBuild();
-  const results = [];
-  for (const component in components) {
-    if (
-      options.compileOnlyCss ||
-      toBuild.includes(components[component].name)
-    ) {
-      results.push(doBuildComponent(components, component, options));
-    }
-  }
+  const results = Object.values(COMPONENTS)
+    .filter(
+      (component) => options.compileOnlyCss || toBuild.includes(component.name)
+    )
+    .map((component) =>
+      buildComponent(
+        component.name,
+        component.version,
+        component.hasCss,
+        {...options, ...component},
+        component.extraGlobs
+      )
+    );
+
   await Promise.all(results);
   if (!options.compileOnlyCss && results.length > 0) {
     endBuildStep(
