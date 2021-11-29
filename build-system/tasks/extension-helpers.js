@@ -101,7 +101,7 @@ const ExtensionOptionDef = {};
 const ExtensionBinaryDef = {};
 
 // All declared extensions.
-const extensions = {};
+const EXTENSIONS = {};
 
 // All extensions to build
 let extensionsToBuild = null;
@@ -150,13 +150,10 @@ function declareExtension(
 /**
  * Initializes all extensions from build-system/compile/bundles.config.extensions.json
  * if not already done and populates the given extensions object.
- * @param {?Object} extensionsObject
+ * @param {Object} extensionsObject
  * @param {boolean=} includeLatest
  */
-function maybeInitializeExtensions(
-  extensionsObject = extensions,
-  includeLatest = false
-) {
+function maybeInitializeExtensions(extensionsObject, includeLatest = false) {
   if (Object.keys(extensionsObject).length === 0) {
     verifyExtensionBundles();
     extensionBundles.forEach((c) => {
@@ -216,8 +213,8 @@ function getExtensionsToBuild(preBuild = false) {
     !argv.core_runtime_only
   ) {
     const allExtensions = [];
-    for (const extension in extensions) {
-      allExtensions.push(extensions[extension].name);
+    for (const extension in EXTENSIONS) {
+      allExtensions.push(EXTENSIONS[extension].name);
     }
     extensionsToBuild = dedupe(extensionsToBuild.concat(allExtensions));
   }
@@ -346,15 +343,15 @@ function dedupe(arr) {
  */
 async function buildExtensions(options) {
   const startTime = Date.now();
-  maybeInitializeExtensions(extensions, /* includeLatest */ false);
+  maybeInitializeExtensions(EXTENSIONS, /* includeLatest */ false);
   const extensionsToBuild = getExtensionsToBuild();
   const results = [];
-  for (const extension in extensions) {
+  for (const extension in EXTENSIONS) {
     if (
       options.compileOnlyCss ||
-      extensionsToBuild.includes(extensions[extension].name)
+      extensionsToBuild.includes(EXTENSIONS[extension].name)
     ) {
-      results.push(doBuildExtension(extensions, extension, options));
+      results.push(doBuildExtension(EXTENSIONS, extension, options));
     }
   }
   await Promise.all(results);
@@ -950,7 +947,7 @@ module.exports = {
   declareExtension,
   dedupe,
   doBuildExtension,
-  extensions,
+  EXTENSIONS,
   getBentoBuildFilename,
   getExtensionsFromArg,
   getExtensionsToBuild,

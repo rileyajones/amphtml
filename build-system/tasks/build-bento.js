@@ -1,23 +1,21 @@
 const argv = require('minimist')(process.argv.slice(2));
 const debounce = require('../common/debounce');
 const {
-  INABOX_EXTENSION_SET,
   buildBinaries,
   buildExtensionCss,
   buildExtensionJs,
   buildNpmBinaries,
   buildNpmCss,
   declareExtension,
-  dedupe,
   getBentoBuildFilename,
   getExtensionsFromArg,
 } = require('./extension-helpers');
 const {bentoBundles, verifyBentoBundles} = require('../compile/bundles.config');
 const {compileJison} = require('./compile-jison');
 const {endBuildStep, watchDebounceDelay} = require('./helpers');
-const {existsSync, mkdirSync} = require('fs');
 const {getBentoName} = require('./bento-helpers');
 const {log} = require('../common/logging');
+const {mkdirSync} = require('fs');
 const {red} = require('kleur/colors');
 const {watch} = require('chokidar');
 
@@ -27,48 +25,47 @@ const COMPONENTS = {};
 /**
  * Initializes all components from build-system/compile/bundles.config.bento.json
  * if not already done and populates the given components object.
- * @param {?Object} componentsObject
+ * @param {Object} componentsObject
  * @param {boolean=} includeLatest
  */
 function maybeInitializeComponents(componentsObject, includeLatest = false) {
-  if (Object.keys(componentsObject).length === 0) {
-    verifyBentoBundles();
-    bentoBundles.forEach((c) => {
-      declareExtension(
-        c.name,
-        c.version,
-        // TODO(rileyajones): Remove this once the bento build process fully seperated.
-        '0.1',
-        c.options,
-        componentsObject,
-        includeLatest
-      );
-    });
+  if (Object.keys(componentsObject).length > 0) {
+    return;
   }
+  verifyBentoBundles();
+  bentoBundles.forEach((c) => {
+    declareExtension(
+      c.name,
+      c.version,
+      // TODO(rileyajones): Remove this once the bento build process fully seperated.
+      '0.1',
+      c.options,
+      componentsObject,
+      includeLatest
+    );
+  });
 }
 
 /**
  * Process the command line arguments --nocomponents, --components, and
  * --components_from and return a list of the referenced components.
  *
- * @param {boolean=} preBuild
+ * @param {boolean} preBuild Used for lazy building of components.
  * @return {!Array<string>}
  */
 function getComponentsToBuild(preBuild = false) {
-  let componentsToBuild = [];
+  const componentsToBuild = new Set();
   if (argv.extensions) {
     if (typeof argv.extensions !== 'string') {
       log(red('ERROR:'), 'Missing list of components.');
       process.exit(1);
-    } else if (argv.extensions === 'inabox') {
-      argv.extensions = INABOX_EXTENSION_SET.join(',');
     }
     const explicitComponents = argv.extensions.replace(/\s/g, '').split(',');
-    componentsToBuild = dedupe(componentsToBuild.concat(explicitComponents));
+    explicitComponents.forEach((component) => componentsToBuild.add(component));
   }
   if (argv.extensions_from) {
     const componentsFrom = getExtensionsFromArg(argv.extensions_from);
-    componentsToBuild = dedupe(componentsToBuild.concat(componentsFrom));
+    componentsFrom.forEach((component) => componentsToBuild.add(component));
   }
   if (
     !preBuild &&
@@ -78,13 +75,13 @@ function getComponentsToBuild(preBuild = false) {
     !argv.core_runtime_only
   ) {
     const allComponents = Object.values(COMPONENTS).map((c) => c.name);
-    componentsToBuild = dedupe(componentsToBuild.concat(allComponents));
+    allComponents.forEach((component) => componentsToBuild.add(component));
   }
-  return componentsToBuild;
+  return Array.from(componentsToBuild);
 }
 
 /**
- * Watches for non-JS changes within an extensions directory to trigger
+ * Watches for non-JS changes within an components directory to trigger
  * recompilation.
  *
  * @param {string} componentsDir
@@ -133,7 +130,7 @@ async function watchComponent(componentsDir, name, version, hasCss, options) {
  * @param {boolean} hasCss Whether there is a CSS file for this extension.
  * @param {?Object} options
  * @param {!Array=} extraGlobs
- * @return {!Promise<void>}
+ * @return {!Promise<void|void[]>}
  */
 async function buildComponent(name, version, hasCss, options = {}, extraGlobs) {
   options.extraGlobs = extraGlobs;
@@ -148,15 +145,13 @@ async function buildComponent(name, version, hasCss, options = {}, extraGlobs) {
     await watchComponent(componentsDir, name, version, hasCss, options);
   }
 
+  /** @type {Promise<void>[]} */
   const promises = [];
   if (hasCss) {
-    if (!existsSync('build/css')) {
-      mkdirSync('build/css', {recursive: true});
-    }
+    mkdirSync('build/css', {recursive: true});
     promises.push(buildExtensionCss(componentsDir, name, version, options));
     if (options.compileOnlyCss) {
-      await Promise.all(promises);
-      return;
+      return Promise.all(promises);
     }
   }
   promises.push(compileJison(`${componentsDir}/**/*.jison`));
@@ -166,8 +161,7 @@ async function buildComponent(name, version, hasCss, options = {}, extraGlobs) {
     promises.push(buildBinaries(componentsDir, options.binaries, options));
   }
   if (options.isRebuild) {
-    await Promise.all(promises);
-    return;
+    return Promise.all(promises);
   }
 
   const bentoName = getBentoName(name);
@@ -185,7 +179,7 @@ async function buildComponent(name, version, hasCss, options = {}, extraGlobs) {
       extraGlobs: [...(options.extraGlobs || []), `${componentsDir}/**/*.js`],
     })
   );
-  await Promise.all(promises);
+  return Promise.all(promises);
 }
 
 /**
@@ -222,4 +216,9 @@ async function buildBentoComponents(options) {
   }
 }
 
-module.exports = {buildBentoComponents};
+module.exports = {
+  buildBentoComponents,
+  buildComponent,
+  getComponentsToBuild,
+  maybeInitializeComponents,
+};

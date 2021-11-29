@@ -1,3 +1,5 @@
+import {BaseElement} from '#bento/components/amp-jwplayer/1.0/base-element';
+
 import {dict} from '#core/types/object';
 
 import {isExperimentOn} from '#experiments';
@@ -9,8 +11,6 @@ import {
   getConsentPolicyInfo,
   getConsentPolicyState,
 } from '../../../src/consent';
-
-import {BaseElement} from '#bento/components/amp-jwplayer/1.0/base-element';
 
 /** @const {string} */
 const TAG = 'amp-jwplayer';

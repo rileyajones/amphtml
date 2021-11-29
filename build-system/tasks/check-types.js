@@ -12,7 +12,7 @@ const {compileCss} = require('./css');
 const {compileJison} = require('./compile-jison');
 const {cyan, green, red, yellow} = require('kleur/colors');
 const {execOrThrow} = require('../common/exec');
-const {extensions, maybeInitializeExtensions} = require('./extension-helpers');
+const {EXTENSIONS, maybeInitializeExtensions} = require('./extension-helpers');
 const {logClosureCompilerError} = require('../compile/closure-compile');
 const {log} = require('../common/logging');
 const {typecheckNewServer} = require('../server/typescript-compile');
@@ -33,7 +33,7 @@ const CORE_SRCS_GLOBS = [
  * @return {!Array<string>}
  */
 const getExtensionSrcPaths = () =>
-  Object.values(extensions)
+  Object.values(EXTENSIONS)
     .filter((ext) => !ext.noTypeCheck)
     .map(({name, version}) => `extensions/${name}/${version}/${name}.js`)
     .sort();
@@ -304,7 +304,7 @@ async function checkTypes() {
   // Prepare build environment
   process.env.NODE_ENV = 'production';
   cleanupBuildDir();
-  maybeInitializeExtensions();
+  maybeInitializeExtensions(EXTENSIONS);
   typecheckNewServer();
   await Promise.all([compileCss(), compileJison()]);
 
