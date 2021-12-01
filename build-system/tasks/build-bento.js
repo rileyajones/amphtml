@@ -11,7 +11,6 @@ const {
   getExtensionsFromArg,
 } = require('./extension-helpers');
 const {bentoBundles, verifyBentoBundles} = require('../compile/bundles.config');
-const {compileJison} = require('./compile-jison');
 const {endBuildStep, watchDebounceDelay} = require('./helpers');
 const {getBentoName} = require('./bento-helpers');
 const {log} = require('../common/logging');
@@ -154,7 +153,6 @@ async function buildComponent(name, version, hasCss, options = {}, extraGlobs) {
       return Promise.all(promises);
     }
   }
-  promises.push(compileJison(`${componentsDir}/**/*.jison`));
   promises.push(buildNpmBinaries(componentsDir, name, options));
   promises.push(buildNpmCss(componentsDir, options));
   if (options.binaries) {
