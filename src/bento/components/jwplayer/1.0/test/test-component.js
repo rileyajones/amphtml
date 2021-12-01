@@ -1,6 +1,6 @@
 import {mount} from 'enzyme';
 
-import {BentoJwplayer} from '#bento/components/amp-jwplayer/1.0/component';
+import {BentoJwplayer} from '#bento/components/jwplayer/1.0/component';
 
 import * as Preact from '#preact';
 

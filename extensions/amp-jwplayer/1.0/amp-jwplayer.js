@@ -1,4 +1,4 @@
-import {BaseElement} from '#bento/components/amp-jwplayer/1.0/base-element';
+import {BaseElement} from '#bento/components/jwplayer/1.0/base-element';
 
 import {dict} from '#core/types/object';
 
