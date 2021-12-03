@@ -3,8 +3,8 @@
 const argv = require('minimist')(process.argv.slice(2));
 const {
   buildComponent,
-  getComponentsToBuild,
-  maybeInitializeComponents,
+  getBentoComponentsToBuild,
+  maybeInitializeBentoComponents,
 } = require('../tasks/build-bento');
 const {
   doBuild3pVendor,
@@ -22,8 +22,8 @@ const {VERSION} = require('../compile/internal-version');
 const extensionBundles = {};
 maybeInitializeExtensions(extensionBundles, /* includeLatest */ true);
 
-const componentBundles = {};
-maybeInitializeComponents(componentBundles, /* includeLatest */ true);
+const bentoBundles = {};
+maybeInitializeBentoComponents(bentoBundles, /* includeLatest */ true);
 
 const vendorBundles = generateBundles();
 
@@ -184,7 +184,7 @@ async function preBuildExtensions() {
  * @param {?Object} options
  * @return {Promise<void|void[]>}
  */
-function doBuildComponent(components, name, options) {
+function doBuildBentoComponent(components, name, options) {
   const component = components[name];
   return buildComponent(
     component.name,
@@ -199,12 +199,12 @@ function doBuildComponent(components, name, options) {
  * Pre-builds default components and ones requested via command line flags.
  * @return {Promise<void>}
  */
-async function preBuildComponents() {
-  const components = getComponentsToBuild(/* preBuild */ true);
-  for (const componentBundle in componentBundles) {
-    const component = componentBundles[componentBundle].name;
+async function preBuildBentoComponents() {
+  const components = getBentoComponentsToBuild(/* preBuild */ true);
+  for (const componentBundle in bentoBundles) {
+    const component = bentoBundles[componentBundle].name;
     if (components.includes(component) && !componentBundle.endsWith('latest')) {
-      await build(componentBundles, componentBundle, doBuildComponent);
+      await build(bentoBundles, componentBundle, doBuildBentoComponent);
     }
   }
 }
@@ -214,6 +214,6 @@ module.exports = {
   lazyBuildJs,
   lazyBuild3pVendor,
   preBuildExtensions,
-  preBuildComponents,
+  preBuildBentoComponents,
   preBuildRuntimeFiles,
 };

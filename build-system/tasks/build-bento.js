@@ -27,7 +27,10 @@ const COMPONENTS = {};
  * @param {Object} componentsObject
  * @param {boolean=} includeLatest
  */
-function maybeInitializeComponents(componentsObject, includeLatest = false) {
+function maybeInitializeBentoComponents(
+  componentsObject,
+  includeLatest = false
+) {
   if (Object.keys(componentsObject).length > 0) {
     return;
   }
@@ -52,7 +55,7 @@ function maybeInitializeComponents(componentsObject, includeLatest = false) {
  * @param {boolean} preBuild Used for lazy building of components.
  * @return {!Array<string>}
  */
-function getComponentsToBuild(preBuild = false) {
+function getBentoComponentsToBuild(preBuild = false) {
   const componentsToBuild = new Set();
   if (argv.extensions) {
     if (typeof argv.extensions !== 'string') {
@@ -90,12 +93,18 @@ function getComponentsToBuild(preBuild = false) {
  * @param {?Object} options
  * @return {Promise<void>}
  */
-async function watchComponent(componentsDir, name, version, hasCss, options) {
+async function watchBentoComponent(
+  componentsDir,
+  name,
+  version,
+  hasCss,
+  options
+) {
   /**
    * Steps to run when a watched file is modified.
    */
   function watchFunc() {
-    buildComponent(name, version, hasCss, {
+    buildBentoComponent(name, version, hasCss, {
       ...options,
       continueOnError: true,
       isRebuild: true,
@@ -104,9 +113,8 @@ async function watchComponent(componentsDir, name, version, hasCss, options) {
   }
 
   const cssDeps = `${componentsDir}/**/*.css`;
-  const jisonDeps = `${componentsDir}/**/*.jison`;
   const ignored = /dist/; //should not watch npm dist folders.
-  watch([cssDeps, jisonDeps], {ignored}).on(
+  watch([cssDeps], {ignored}).on(
     'change',
     debounce(watchFunc, watchDebounceDelay)
   );
@@ -131,7 +139,13 @@ async function watchComponent(componentsDir, name, version, hasCss, options) {
  * @param {!Array=} extraGlobs
  * @return {!Promise<void|void[]>}
  */
-async function buildComponent(name, version, hasCss, options = {}, extraGlobs) {
+async function buildBentoComponent(
+  name,
+  version,
+  hasCss,
+  options = {},
+  extraGlobs
+) {
   options.extraGlobs = extraGlobs;
   options.npm = true;
   options.bento = true;
@@ -141,7 +155,7 @@ async function buildComponent(name, version, hasCss, options = {}, extraGlobs) {
   }
   const componentsDir = `src/bento/components/${name}/${version}`;
   if (options.watch) {
-    await watchComponent(componentsDir, name, version, hasCss, options);
+    await watchBentoComponent(componentsDir, name, version, hasCss, options);
   }
 
   /** @type {Promise<void>[]} */
@@ -188,14 +202,14 @@ async function buildComponent(name, version, hasCss, options = {}, extraGlobs) {
  */
 async function buildBentoComponents(options) {
   const startTime = Date.now();
-  maybeInitializeComponents(COMPONENTS);
-  const toBuild = getComponentsToBuild();
+  maybeInitializeBentoComponents(COMPONENTS);
+  const toBuild = getBentoComponentsToBuild();
   const results = Object.values(COMPONENTS)
     .filter(
       (component) => options.compileOnlyCss || toBuild.includes(component.name)
     )
     .map((component) =>
-      buildComponent(
+      buildBentoComponent(
         component.name,
         component.version,
         component.hasCss,
@@ -216,7 +230,7 @@ async function buildBentoComponents(options) {
 
 module.exports = {
   buildBentoComponents,
-  buildComponent,
-  getComponentsToBuild,
-  maybeInitializeComponents,
+  buildComponent: buildBentoComponent,
+  getBentoComponentsToBuild,
+  maybeInitializeBentoComponents,
 };
