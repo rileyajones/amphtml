@@ -59,6 +59,7 @@ createTask('presubmit', 'presubmit');
 createTask('prettify');
 createTask('release');
 createTask('serve');
+createTask('build-tests', 'buildTests');
 createTask('server-tests', 'serverTests');
 createTask('storybook');
 createTask('sweep-experiments', 'sweepExperiments');
