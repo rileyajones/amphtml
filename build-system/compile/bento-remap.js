@@ -68,13 +68,14 @@ const getAllRemappings = once(() => {
   // Allow component cross-dependency
   const componentRemappings = bentoBundles.map(({name, version}) => ({
     source: `./src/bento/components/${name}/${version}/${name}`,
-    cdn: `./${name}-${version}.mjs`,
+    // cdn: `./${name}-${version}.mjs`,
     npm: `@bentoproject/${getNameWithoutComponentPrefix(name)}`,
   }));
 
   return /** @type {MappingEntryDef[]} */ (
     [...coreBentoRemappings, ...componentRemappings]
-      .map(({cdn, npm, source}) => {
+      .map((remap) => {
+        const {cdn, npm, source} = /** @type {MappingEntryDef} */ (remap);
         const resolved = resolveExactModuleFile(source);
         if (resolved) {
           return {source: resolved, cdn, npm};
