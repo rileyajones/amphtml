@@ -63,6 +63,22 @@
     }
   },
   {
+    "name": "bento-fit-text",
+    "version": "1.0",
+    "latestVersion": "0.1",
+    "options": {
+      "hasCss": true
+    }
+  },
+  {
+    "name": "bento-iframe",
+    "version": "1.0",
+    "latestVersion": "0.1",
+    "options": {
+      "hasCss": true
+    }
+  },
+  {
     "name": "bento-inline-gallery",
     "version": "1.0",
     "latestVersion": "0.1",
@@ -86,14 +102,6 @@
     }
   },
   {
-    "name": "bento-lightbox",
-    "version": "1.0",
-    "latestVersion": "0.1",
-    "options": {
-      "hasCss": true
-    }
-  },
-  {
     "name": "bento-lightbox-gallery",
     "version": "1.0",
     "latestVersion": "0.1",
@@ -102,7 +110,31 @@
     }
   },
   {
+    "name": "bento-mathml",
+    "version": "1.0",
+    "latestVersion": "0.1",
+    "options": {
+      "hasCss": true
+    }
+  },
+  {
     "name": "bento-reddit",
+    "version": "1.0",
+    "latestVersion": "0.1",
+    "options": {
+      "hasCss": true
+    }
+  },
+  {
+    "name": "bento-selector",
+    "version": "1.0",
+    "latestVersion": "0.1",
+    "options": {
+      "hasCss": true
+    }
+  },
+  {
+    "name": "bento-sidebar",
     "version": "1.0",
     "latestVersion": "0.1",
     "options": {
@@ -119,6 +151,24 @@
   },
   {
     "name": "bento-soundcloud",
+    "version": "1.0",
+    "latestVersion": "0.1",
+    "options": {
+      "hasCss": true
+    }
+  },
+  {
+    "name": "bento-stream-gallery",
+    "version": "1.0",
+    "latestVersion": "0.1",
+    "options": {
+      "hasCss": true,
+      "npm": true,
+      "bento": true
+    }
+  },
+  {
+    "name": "bento-timeago",
     "version": "1.0",
     "latestVersion": "0.1",
     "options": {
@@ -151,6 +201,14 @@
   },
   {
     "name": "bento-vimeo",
+    "version": "1.0",
+    "latestVersion": "0.1",
+    "options": {
+      "hasCss": true
+    }
+  },
+  {
+    "name": "bento-wordpress-embed",
     "version": "1.0",
     "latestVersion": "0.1",
     "options": {
