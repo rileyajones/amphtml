@@ -142,6 +142,5 @@ jobs:
           else
             npm publish --access public --tag latest
           fi
-          cd -
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
